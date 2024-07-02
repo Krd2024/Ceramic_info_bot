@@ -144,11 +144,16 @@ async def plitka(message: types.Message):
 async def mail(msg: types.Message):
     await msg.answer(f"Тел. мастера: 8(900)111-11-111")
 
+    # mention = (
+    #     f'<a href="tg://user?id={msg.from_user.id}">{msg.from_user.first_name}</a>'
+    # )
     mention = (
         f'<a href="tg://user?id=@{msg.from_user.id}">{msg.from_user.first_name}</a>'
     )
     await bot.send_message(
-        5744848801, text=f"Запрос контакта от {mention}", parse_mode="HTML"
+        msg.from_user.id,
+        text=f"Запрос контакта от {mention}\nuser_id {msg.from_user.id}",
+        parse_mode="HTML",
     )
     # await bot.send_message(5744848801, text=f"{msg.from_user.id}")
     # #
@@ -165,8 +170,8 @@ async def mail(msg: types.Message):
 async def func_contact(msg: Message):
     await msg.answer(f"Спасибо.В ближайшее время мы Вам позвоним.")
     # await msg.answer(f"Контакт:{msg.contact.phone_number}")
-    await bot.send_message(5744848801, text=f"Заказ")
-    await bot.send_message(5744848801, text=f"{msg.contact.phone_number}")
+    await bot.send_message(msg.from_user.id, text=f"Заказ")
+    await bot.send_message(msg.from_user.id, text=f"{msg.contact.phone_number}")
 
     contact = msg.contact
     phone_number = contact.phone_number
