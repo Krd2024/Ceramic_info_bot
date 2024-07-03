@@ -8,9 +8,9 @@ from aiogram.filters import Command
 from aiogram.enums import content_type
 from aiogram import F
 from utils import (
-    add_user_to_db,
     application,
     gipsokarton_key,
+    gipsokarton_key_choice_price,
     plitka_key,
     plitka_key_choice_price,
 )
@@ -25,7 +25,8 @@ from aiogram.types import (
 # from aiogram.dispatcher import Dispatcher
 from decouple import config
 from wrapper_bot import TelegramBotWrapper
-from utils import add_user_to_db
+
+# from utils import add_user_to_db
 
 # from utils import *
 from wrapper_bot import TelegramBotWrapper
@@ -63,25 +64,8 @@ chat_data = {}
 @dp.message(Command(commands=["start"]))
 async def clear_chat_and_send_welcome(message: types.Message):
     print("Start bot")
-    chat_id = message.chat.id
 
-    # Очистка предыдущих сообщений
-    if chat_id in chat_data:
-        for message_id in chat_data[chat_id].get("user_messages", []):
-            try:
-                await bot.delete_message(chat_id, message_id)
-                print("Start bot - 2")
-            except Exception as e:
-                print(f"Не удалось удалить сообщение {message_id}: {e}")
-
-    # Отправка приветственного сообщения
-    welcome_message = await message.answer(
-        "Добро пожаловать! Ваше сообщение сохранено."
-    )
-    print("Start bot - 3")
-    # Обновление chat_data с ID нового сообщения
-    chat_data[chat_id] = {"user_messages": [welcome_message.message_id]}
-
+    # =================================================================
     # занести пользователя в базу
     # await add_user_to_db(
     #     user_id=message.from_user.id,
@@ -90,13 +74,26 @@ async def clear_chat_and_send_welcome(message: types.Message):
     #     last_name=message.from_user.last_name,
     # )
 
+    # ===============================================================
+
+    # Отправка файла из файловой системы
+    # file_ids = []
+
+    # image_from_pc = FSInputFile("plitka_sanuzel.jpeg")
+    # result = await message.answer_photo(
+    #     image_from_pc, caption="Изображение из файла на компьютере"
+    # )
+    # file_ids.append(result.photo[-1].file_id)
+    # print(file_ids)
+
+    # ================================================================
     # вызвать главное меню
     print("await main_menu(message)")
     await main_menu(message)
 
 
 # =================================================================
-@dp.message(F.text.startswith("👉 Ст"))
+@dp.message(F.text.startswith("👉 Пл"))
 async def plitka(message: types.Message):
     """Стоимость работ"""
 
@@ -111,7 +108,7 @@ async def gipsokarton(message: types.Message):
 
 
 @dp.message(F.text.startswith("📝 Ос"))
-async def gipsokarton(message: types.Message):
+async def tel(message: types.Message):
     await application(message)
     # await message.reply("Гипсокартон!")
 
@@ -119,22 +116,51 @@ async def gipsokarton(message: types.Message):
 # =================================================================
 
 
-@dp.message(F.text.startswith(("Пол", "Стены", "Санузел", "Объём")))
+@dp.message(F.text.startswith(("Пол", "Стены", "Санузел", "Объём", "⬅️ Назад")))
 async def plitka(message: types.Message):
 
     print(message.text)
     if message.text == ("Пол"):
         key = 1
 
-    if message.text == ("Санузел"):
+    elif message.text == ("Санузел"):
         key = 2
-    if message.text == ("Объём"):
+    elif message.text == ("Объём"):
         key = 3
+    elif message.text == ("⬅️ Назад"):
+        await main_menu(message)
+        return
 
     # keyboard = await plitka_key(message)
 
     # await message.answer(reply_markup=keyboard, text="Выбор работ")
     await plitka_key_choice_price(message, key=key)
+
+
+@dp.message(
+    F.text.startswith(("Создание ", "Выравнивание", "Возведение", "Отделка", "⬅️ Назад"))
+)
+async def plitka(message: types.Message):
+
+    print(message.text)
+    if message.text == ("Создание "):
+        key = 1
+
+    elif message.text == ("Выравнивание"):
+        key = 2
+    elif message.text == ("Возведение"):
+        key = 3
+    elif message.text == ("Отделка"):
+        key = 3
+
+    elif message.text == ("⬅️ Назад"):
+        await main_menu(message)
+        return
+
+    # keyboard = await plitka_key(message)
+
+    # await message.answer(reply_markup=keyboard, text="Выбор работ")
+    await gipsokarton_key_choice_price(message, key=key)
 
 
 # =================================================================
