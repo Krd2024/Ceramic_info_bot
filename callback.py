@@ -1,45 +1,23 @@
-import asyncio
-from aiogram import types, Dispatcher, Router
-from aiogram.types import Message, BotCommand, InputFile, CallbackQuery
+from aiogram import types, Dispatcher
+from aiogram.types import Message
 from aiogram.filters import Command
-
-2
-
-from aiogram.enums import content_type
 from aiogram import F
 from utils import (
+    add_user_to_db,
+    admin_info_db,
     application,
     gipsokarton_key,
     gipsokarton_key_choice_price,
     plitka_key,
     plitka_key_choice_price,
 )
-from aiogram.types import (
-    Message,
-    InputMediaPhoto,
-    InputMedia,
-    ContentType,
-    InputMediaAnimation,
-)
-
-# from aiogram.dispatcher import Dispatcher
+from aiogram.types import Message
 from decouple import config
-from wrapper_bot import TelegramBotWrapper
-
-# from utils import add_user_to_db
-
-# from utils import *
-from wrapper_bot import TelegramBotWrapper
+from aiogram.types import FSInputFile
+from aiogram.methods.edit_message_media import EditMessageMedia
 from aiogram import Dispatcher, types
 
-# from aiogram import MemoryStorage
-from decouple import config
-from aiogram.utils.keyboard import InlineKeyboardButton, InlineKeyboardMarkup
-
-from aiogram.types import FSInputFile, URLInputFile
-
-from aiogram.methods.edit_message_media import EditMessageMedia
-
+from wrapper_bot import TelegramBotWrapper
 from menu import main_menu
 
 
@@ -64,30 +42,70 @@ chat_data = {}
 @dp.message(Command(commands=["start"]))
 async def clear_chat_and_send_welcome(message: types.Message):
     print("Start bot")
+    uid = message.from_user.id
 
     # =================================================================
     # занести пользователя в базу
-    # await add_user_to_db(
-    #     user_id=message.from_user.id,
-    #     username=message.from_user.username,
-    #     first_name=message.from_user.first_name,
-    #     last_name=message.from_user.last_name,
-    # )
+    ADMIN = config("ADMIN", cast=lambda x: x.split(","), default="пусто")
+    if str(uid) not in ADMIN:
+        await add_user_to_db(
+            user_id=message.from_user.id,
+            username=message.from_user.username,
+            first_name=message.from_user.first_name,
+        )
 
     # ===============================================================
 
     # Отправка файла из файловой системы
-    # file_ids = []
+    file_ids = []
 
-    # image_from_pc = FSInputFile("plitka_sanuzel.jpeg")
+    image_from_pc = FSInputFile("viravnivanie_sten.jpg")
+    result = await message.answer_photo(
+        image_from_pc, caption="Изображение из файла на компьютере"
+    )
+    #  для фото
+
+    file_ids.append(result.photo[0].file_id)
+    print(file_ids)
+
+    # image_from_pc = FSInputFile("peregorodka.jpeg")
     # result = await message.answer_photo(
     #     image_from_pc, caption="Изображение из файла на компьютере"
     # )
-    # file_ids.append(result.photo[-1].file_id)
+    # #  для фото
+    # file_ids.append(result.photo[0].file_id)
     # print(file_ids)
 
+    # image_from_pc = FSInputFile("potolok.jpg")
+    # result = await message.answer_photo(
+    #     image_from_pc, caption="Изображение из файла на компьютере"
+    # )
+    # #  для фото
+    # file_ids.append(result.photo[0].file_id)
+    # print(file_ids)
+
+    # image_from_pc = FSInputFile("stena.gif")
+    # result = await message.answer_animation(
+    #     image_from_pc, caption="Изображение из файла на компьютере"
+    # )
+    # file_id = result.video.file_id
+    # file_ids.append(file_id)
+    # # print(result)
+    # print(f"File ID: {file_id}")
+    # --------------------------------
+
+    # для гиф
+    # file_id = result.animation.file_id
+    # file_ids.append(file_id)
+    # print(f"File ID: {file_id}")
+
     # ================================================================
+
+    # h = "soobshenie @maxkalinin"
+    # await bot.send_message(message.from_user.id, h)
+
     # вызвать главное меню
+
     print("await main_menu(message)")
     await main_menu(message)
 
@@ -97,7 +115,6 @@ async def clear_chat_and_send_welcome(message: types.Message):
 async def plitka(message: types.Message):
     """Стоимость работ"""
 
-    print("Стоимость работ")
     await plitka_key(message)
 
 
@@ -110,6 +127,11 @@ async def gipsokarton(message: types.Message):
 @dp.message(F.text.startswith("📝 Ос"))
 async def tel(message: types.Message):
     await application(message)
+
+
+@dp.message(F.text.startswith("⚙️ Инфо"))
+async def info(message: types.Message):
+    await admin_info_db(message)
     # await message.reply("Гипсокартон!")
 
 
@@ -118,6 +140,7 @@ async def tel(message: types.Message):
 
 @dp.message(F.text.startswith(("Пол", "Стены", "Санузел", "Объём", "⬅️ Назад")))
 async def plitka(message: types.Message):
+    chat_id = message.chat.id
 
     print(message.text)
     if message.text == ("Пол"):
@@ -128,12 +151,8 @@ async def plitka(message: types.Message):
     elif message.text == ("Объём"):
         key = 3
     elif message.text == ("⬅️ Назад"):
-        await main_menu(message)
-        return
+        key = 4
 
-    # keyboard = await plitka_key(message)
-
-    # await message.answer(reply_markup=keyboard, text="Выбор работ")
     await plitka_key_choice_price(message, key=key)
 
 
@@ -143,22 +162,24 @@ async def plitka(message: types.Message):
 async def plitka(message: types.Message):
 
     print(message.text)
-    if message.text == ("Создание "):
+    if message.text.startswith("Создание "):
         key = 1
 
-    elif message.text == ("Выравнивание"):
+    elif message.text.startswith("Выравнивание"):
         key = 2
-    elif message.text == ("Возведение"):
+    elif message.text.startswith("Возведение"):
         key = 3
-    elif message.text == ("Отделка"):
-        key = 3
-
+    elif message.text.startswith("Отделка"):
+        key = 4
     elif message.text == ("⬅️ Назад"):
         await main_menu(message)
         return
 
-    # keyboard = await plitka_key(message)
+    # elif message.text == ("⬅️ Назад"):
+    #     await main_menu(message)
+    #     return
 
+    # keyboard = await plitka_key(message)
     # await message.answer(reply_markup=keyboard, text="Выбор работ")
     await gipsokarton_key_choice_price(message, key=key)
 
@@ -168,25 +189,23 @@ async def plitka(message: types.Message):
 
 @dp.message(F.text.startswith("Номер"))
 async def mail(msg: types.Message):
-    await msg.answer(f"Тел. мастера: 8(900)111-11-111")
+    TELEPHON = config("TELEPHON", cast=str, default="пусто")
+    await msg.answer(TELEPHON)
+    # await msg.answer(f"Тел. мастера: 8(900)111-11-111")
 
     # mention = (
     #     f'<a href="tg://user?id={msg.from_user.id}">{msg.from_user.first_name}</a>'
     # )
+    # h = f'soobshenie <a href="http://t.me/{message.from_user.username}">max</a>'
+
     mention = (
-        f'<a href="tg://user?id=@{msg.from_user.id}">{msg.from_user.first_name}</a>'
+        f'<a href="http://t.me/{msg.from_user.username}">{msg.from_user.first_name}</a>'
     )
     await bot.send_message(
-        msg.from_user.id,
+        5744848801,
         text=f"Запрос контакта от {mention}\nuser_id {msg.from_user.id}",
         parse_mode="HTML",
     )
-    # await bot.send_message(5744848801, text=f"{msg.from_user.id}")
-    # #
-    # await bot.send_message(5744848801, text=f"{msg.chat.first_name}")
-    #
-    # mention = f"[{msg.from_user.first_name}](tg://user?id={msg.from_user.id})"
-    # await bot.send_message(5744848801, f"Привет, {mention}!", parse_mode="HTML")
 
 
 # =================================================================
@@ -196,14 +215,22 @@ async def mail(msg: types.Message):
 async def func_contact(msg: Message):
     await msg.answer(f"Спасибо.В ближайшее время мы Вам позвоним.")
     # await msg.answer(f"Контакт:{msg.contact.phone_number}")
-    await bot.send_message(msg.from_user.id, text=f"Заказ")
-    await bot.send_message(msg.from_user.id, text=f"{msg.contact.phone_number}")
+    await bot.send_message(5744848801, text=f"Заказ")
+    await bot.send_message(5744848801, text=f"{msg.contact.phone_number}")
 
     contact = msg.contact
     phone_number = contact.phone_number
     first_name = contact.first_name
     user_id = contact.user_id
     print(phone_number, "\n", user_id, "\n", first_name)
+    mention = (
+        f'<a href="http://t.me/{msg.from_user.username}">{msg.from_user.first_name}</a>'
+    )
+    await bot.send_message(
+        5744848801,
+        text=f"Запрос контакта от {mention}\nuser_id {msg.from_user.id}",
+        parse_mode="HTML",
+    )
 
 
 # ----------------------------------------------------------------

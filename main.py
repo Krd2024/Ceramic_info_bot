@@ -5,6 +5,7 @@ from utils import *
 from aiogram import Dispatcher
 from callback import main
 
+
 TOKEN = config("TOKEN", cast=str, default="пусто")
 bot = TelegramBotWrapper(TOKEN)
 dp = Dispatcher()

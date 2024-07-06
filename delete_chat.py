@@ -1,5 +1,4 @@
 from decouple import config
-
 from wrapper_bot import TelegramBotWrapper
 
 
@@ -16,9 +15,4 @@ async def delete(chat_id, chat_data):
                 print(f"Не удалось удалить сообщение {message_id}: {e}")
 
 
-# # Отправка приветственного сообщения
-# welcome_message = await message.answer(
-#     "Добро пожаловать! Ваше сообщение сохранено."
-# )
-# # Обновление chat_data с ID нового сообщения
 # chat_data[chat_id] = {"user_messages": [welcome_message.message_id]}
