@@ -25,3 +25,4 @@ peregorodka_gips = (
 )
 
 potolok_gips = "AgACAgIAAxkDAAPSZomm82hHcAABojKgNN6J8cGGxNEGAAJ23TEbbshJSPrjNJvhHgABewEAAwIAA3MAAzUE"
+main_img = "AgACAgIAAxkDAAIBimaKbkEpTvwrbEoVflwM_B53A3rTAAKN2TEbbshRSF896Ye9_-7IAQADAgADcwADNQQ"

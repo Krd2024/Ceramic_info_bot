@@ -85,7 +85,7 @@ async def clear_chat_and_send_welcome(message: types.Message):
     # Отправка файла из файловой системы
     # file_ids = []
 
-    # image_from_pc = FSInputFile("viravnivanie_sten.jpg")
+    # image_from_pc = FSInputFile("main.jpg")
     # result = await message.answer_photo(
     #     image_from_pc, caption="Изображение из файла на компьютере"
     # )

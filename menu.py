@@ -9,6 +9,9 @@ from aiogram.utils.chat_action import ChatActionSender
 from aiogram import types
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from decouple import config
+from aiogram.types import FSInputFile
+
+# from main import *
 
 from wrapper_bot import TelegramBotWrapper
 
@@ -55,9 +58,20 @@ async def main_menu(message: Message, callback=None):
             ):
                 await asyncio.sleep(1)
 
-            message_menu = await message.answer(
-                welcome_message,
-                reply_markup=builder.as_markup(resize_keyboard=True),
+            # message_menu = await message.answer(
+            #     welcome_message,
+            #     reply_markup=builder.as_markup(resize_keyboard=True),
+            # )
+            main_img = FSInputFile("main.jpg")
+            message_menu = (
+                await message.answer_photo(
+                    main_img,
+                    caption=welcome_message,
+                    reply_markup=builder.as_markup(
+                        resize_keyboard=True,
+                        input_field_placeholder="Воспользуйтесь меню:",
+                    ),
+                ),
             )
 
         return
