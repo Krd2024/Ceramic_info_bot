@@ -56,12 +56,14 @@ async def admin_info_db(message):
         for row in res:
             info += f"\nИмя:{row[2]}\nUsername:{row[0]}\nId:{row[1]}\nВремя:{row[3]}\n*"
 
-        print(info)
+        # print(info)
 
         ADMIN = config("ADMIN", cast=lambda x: x.split(","), default="пусто")
 
         for admin_id in ADMIN:
-            print(admin_id)
+            # print(admin_id)
+            if info == "":
+                info = f"Нет сообщений"
 
             message_info = await bot.send_message(admin_id, info)
             chat_data[chat_id] = {"user_messages": [message_info.message_id]}
