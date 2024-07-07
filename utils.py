@@ -93,7 +93,9 @@ async def gipsokarton_key(message: types.Message):
 
     await message.answer(
         text=text_gips,
-        reply_markup=builder.as_markup(resize_keyboard=True),
+        reply_markup=builder.as_markup(
+            resize_keyboard=True, input_field_placeholder="Воспользуйтесь меню:"
+        ),
     )
 
 
@@ -117,7 +119,9 @@ async def plitka_key(message: types.Message):
 
     await message.answer(
         text=text_plitka,
-        reply_markup=builder.as_markup(resize_keyboard=True),
+        reply_markup=builder.as_markup(
+            resize_keyboard=True, input_field_placeholder="Воспользуйтесь меню:"
+        ),
     )
 
 

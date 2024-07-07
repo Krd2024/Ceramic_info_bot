@@ -26,6 +26,15 @@ bot = TelegramBotWrapper(TOKEN)
 dp = Dispatcher()
 
 
+# async def set_commands():
+#     commands = [
+#         BotCommand(command="start", description="Старт"),
+#         # BotCommand(command="start_2", description="Старт 2"),
+#         # BotCommand(command="start_3", description="Старт 3"),
+#     ]
+#     await bot.set_my_commands(commands, BotCommandScopeDefault())
+
+
 async def main():
     # Запуск поллинга
     # await bot.set_my_commands([BotCommand(command="start", description="Начать")])
@@ -34,9 +43,15 @@ async def main():
         await dp.start_polling(bot)
     finally:
         await bot.session.close()
+    # await set_commands()
 
+
+from aiogram.types import BotCommand, BotCommandScopeDefault
+from aiogram.utils.media_group import MediaGroupBuilder
 
 chat_data = {}
+
+from img import *
 
 
 @dp.message(Command(commands=["start"]))
@@ -55,18 +70,29 @@ async def clear_chat_and_send_welcome(message: types.Message):
         )
 
     # ===============================================================
+    #    ----------------- Альбом -----------
 
+    # album_builder = MediaGroupBuilder(caption="Общая подпись для будущего альбома")
+
+    # album_builder.add_photo(media=plitka_sanuzel)
+    # album_builder.add_photo(media=plitka_many)
+    # album_builder.add_photo(media=peregorodka_gips)
+    # await message.answer_media_group(
+    #     # Не забудьте вызвать build()
+    #     media=album_builder.build()
+    # )
+    # ----------------------------------------------------------------
     # Отправка файла из файловой системы
-    file_ids = []
+    # file_ids = []
 
-    image_from_pc = FSInputFile("viravnivanie_sten.jpg")
-    result = await message.answer_photo(
-        image_from_pc, caption="Изображение из файла на компьютере"
-    )
-    #  для фото
+    # image_from_pc = FSInputFile("viravnivanie_sten.jpg")
+    # result = await message.answer_photo(
+    #     image_from_pc, caption="Изображение из файла на компьютере"
+    # )
+    # #  для фото
 
-    file_ids.append(result.photo[0].file_id)
-    print(file_ids)
+    # file_ids.append(result.photo[0].file_id)
+    # print(file_ids)
 
     # image_from_pc = FSInputFile("peregorodka.jpeg")
     # result = await message.answer_photo(
