@@ -2,6 +2,7 @@ from aiogram import types, Dispatcher
 from aiogram.types import Message
 from aiogram.filters import Command
 from aiogram import F
+from delete_chat import delete
 from utils import (
     add_user_to_db,
     admin_info_db,
@@ -38,6 +39,7 @@ dp = Dispatcher()
 async def main():
     # Запуск поллинга
     # await bot.set_my_commands([BotCommand(command="start", description="Начать")])
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
     try:
         await dp.start_polling(bot)
@@ -217,6 +219,8 @@ async def plitka(message: types.Message):
 async def mail(msg: types.Message):
     TELEPHON = config("TELEPHON", cast=str, default="пусто")
     await msg.answer(TELEPHON)
+
+    await delete(msg.chat.id, chat_data)
     # await msg.answer(f"Тел. мастера: 8(900)111-11-111")
 
     # mention = (
@@ -227,11 +231,16 @@ async def mail(msg: types.Message):
     mention = (
         f'<a href="http://t.me/{msg.from_user.username}">{msg.from_user.first_name}</a>'
     )
-    await bot.send_message(
-        5744848801,
-        text=f"Запрос контакта от {mention}\nuser_id {msg.from_user.id}",
-        parse_mode="HTML",
-    )
+    ADMIN = config("ADMIN", cast=lambda x: x.split(","), default="пусто")
+
+    for admin_id in ADMIN:
+
+        message_info = await bot.send_message(
+            admin_id,
+            text=f"Запрос контакта от {mention}\nuser_id {msg.from_user.id}",
+            parse_mode="HTML",
+        )
+        chat_data[msg.chat.id] = {"user_messages": [message_info.message_id]}
 
 
 # =================================================================
@@ -239,10 +248,25 @@ async def mail(msg: types.Message):
 
 @dp.message(F.contact)
 async def func_contact(msg: Message):
+    """Отправить уведомление о заказе"""
+
+    await delete(msg.chat.id, chat_data)
     await msg.answer(f"Спасибо.В ближайшее время мы Вам позвоним.")
-    # await msg.answer(f"Контакт:{msg.contact.phone_number}")
-    await bot.send_message(5744848801, text=f"Заказ")
-    await bot.send_message(5744848801, text=f"{msg.contact.phone_number}")
+    ADMIN = config("ADMIN", cast=lambda x: x.split(","), default="пусто")
+
+    for admin_id in ADMIN:
+
+        message_info = await bot.send_message(
+            admin_id,
+            text=f"Заказ от {msg.contact.phone_number}",
+            parse_mode="HTML",
+        )
+        chat_data[msg.chat.id] = {"user_messages": [message_info.message_id]}
+        # await msg.answer(f"Контакт:{msg.contact.phone_number}")
+        # await bot.send_message(5744848801, text=f"Заказ")
+        # await bot.send_message(5744848801, text=f"{msg.contact.phone_number}")
+
+    # --------------------------------------------------------------------------
 
     contact = msg.contact
     phone_number = contact.phone_number
@@ -254,7 +278,7 @@ async def func_contact(msg: Message):
     )
     await bot.send_message(
         5744848801,
-        text=f"Запрос контакта от {mention}\nuser_id {msg.from_user.id}",
+        text=f"Заказ от {mention}\nuser_id {msg.from_user.id}",
         parse_mode="HTML",
     )
 

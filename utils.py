@@ -58,15 +58,15 @@ async def admin_info_db(message):
 
         # print(info)
 
-        ADMIN = config("ADMIN", cast=lambda x: x.split(","), default="пусто")
+        # ADMIN = config("ADMIN", cast=lambda x: x.split(","), default="пусто")
 
-        for admin_id in ADMIN:
-            # print(admin_id)
-            if info == "":
-                info = f"Нет сообщений"
+        # for admin_id in ADMIN:
+        #     # print(admin_id)
+        if info == "":
+            info = f"Нет сообщений"
 
-            message_info = await bot.send_message(admin_id, info)
-            chat_data[chat_id] = {"user_messages": [message_info.message_id]}
+        message_info = await bot.send_message(chat_id, info)
+        chat_data[chat_id] = {"user_messages": [message_info.message_id]}
         # import asyncio
 
         # tasks = [bot.send_message(admin_id, info) for admin_id in ADMIN]
